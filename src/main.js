@@ -172,12 +172,18 @@ function completeTodo(id) {
 }
 
 function deleteCompleted() {
-  todoList = todoList.filter(element => {
-    if (element.completed === false) {
-      return element
+  todoList.forEach(async (element) => {
+    if (element.completed) {
+      await fetch(`http://localhost:3000/todos/${element.id}`,
+        {
+          method: 'DELETE',
+        }
+      ).then((response) => {
+        getAllTodos()
+        displayTodos(todoList)
+      })
     }
   })
-  displayTodos(todoList)
 }
 
 
@@ -192,7 +198,7 @@ function editTodo(task) {
 }
 
 //save 
-const saveTodo = () => {
+const saveTodo = async () => {
   let newTaskName = document.querySelector('#newTaskName').value;
   let selectedCategory = document.querySelector('#addSelectCategory');
 
@@ -200,25 +206,38 @@ const saveTodo = () => {
     selectedCategory.value = "Uncategorized";
   }
 
-  todoList.forEach(element => {
-    if (element.id === todoIdToBeEdited) {
-      element.category = selectedCategory.value;
-      element.taskName = newTaskName;
-    }
 
-  });
+  await fetch(`http://localhost:3000/todos/${todoIdToBeEdited}`,
+    {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        taskName: newTaskName,
+        category: selectedCategory.value
+      })
+    }
+  ).then(async (response) => {
+  })
+
 
   document.querySelector('#newTaskName').value = '';
   document.querySelector('#saveTaskButton').style.display = 'none';
   document.querySelector('#addTaskButton').style.display = 'block';
   selectedCategory.selectedIndex = 0;
   todoIdToBeEdited = -1;
+  getAllTodos();
   displayTodos(todoList);
 }
 
 document.querySelector('#saveTaskButton').addEventListener('click', () => {
   saveTodo();
 })
+document.querySelector('#deleteCompleteButton').addEventListener('click', () => {
+  deleteCompleted();
+})
+
 
 // grab unique categories and display them in drop down
 async function displayCategories(categoryList) {

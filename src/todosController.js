@@ -35,10 +35,10 @@ router.post('/', async (req, res) => {
     res.send(newTodo);
 });
 
-router.put('/:category', (req, res) => {
+router.put('/:id', (req, res) => {
     let result = todos.find((todo, index) => {
         if (todo.id == req.params.id) {
-            todo.taskName = req.body.name
+            todo.taskName = req.body.taskName
             todo.category = req.body.category
             return true;
         }
